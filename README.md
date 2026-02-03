@@ -31,7 +31,7 @@ jobs:
 ### All Options
 
 ```yaml
-- uses: huggingface/huggingface-sync-action@main
+- uses: huggingface/hub-sync@main
   with:
     # Required
     github_repo_id: ${{ github.repository }}
@@ -50,4 +50,4 @@ jobs:
 - **Automatic exclusions** — `.github/` and `.git/` filtered via `--exclude`
 - **True mirroring** — deletes removed files from HF using `--delete="*"`
 - **Subdirectory support** — perfect for monorepos
-- **Custom commit messages** — synced commits say "Sync from GitHub via huggingface-sync-action"
+- **Custom commit messages** — synced commits say "Sync from GitHub via hub-sync"
