@@ -1,4 +1,4 @@
-# huggingface-sync-action
+# hub-sync action
 
 A GitHub Action that syncs your repository to Hugging Face Hub 🤗
 
