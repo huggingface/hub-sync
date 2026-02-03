@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: huggingface/huggingface-sync-action@main
+      - uses: huggingface/hub-sync@main
         with:
           github_repo_id: ${{ github.repository }}
           huggingface_repo_id: username/repo-name
@@ -46,17 +46,8 @@ jobs:
 ```
 
 ## Features
-**Automatic exclusions** — `.github/` and `.git/` filtered via `--exclude`
-**True mirroring** — deletes removed files from HF using `--delete="*"`
-**Subdirectory support** — perfect for monorepos
-**Custom commit messages** — synced commits say "Sync from GitHub via huggingface-sync-action"
 
-## What Gets Synced
-
-**✅ Synced:**
-- All files in the repo (or subdirectory)
-- Excluding `.git/` and `.github/`
-
-**❌ Not synced:**
-- `.github/` directory
-- `.git/` directory
+- **Automatic exclusions** — `.github/` and `.git/` filtered via `--exclude`
+- **True mirroring** — deletes removed files from HF using `--delete="*"`
+- **Subdirectory support** — perfect for monorepos
+- **Custom commit messages** — synced commits say "Sync from GitHub via huggingface-sync-action"
