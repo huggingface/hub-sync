@@ -1,4 +1,4 @@
-# huggingface-sync-action
+# hub-sync
 
 A GitHub Action that syncs your repository to Hugging Face Hub 🤗
 
@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: huggingface/huggingface-sync-action@main
+      - uses: huggingface/hub-sync@main
         with:
           github_repo_id: ${{ github.repository }}
           huggingface_repo_id: username/repo-name
@@ -31,7 +31,7 @@ jobs:
 ### All Options
 
 ```yaml
-- uses: huggingface/huggingface-sync-action@main
+- uses: huggingface/hub-sync@main
   with:
     # Required
     github_repo_id: ${{ github.repository }}
@@ -49,7 +49,7 @@ jobs:
 **Automatic exclusions** — `.github/` and `.git/` filtered via `--exclude`
 **True mirroring** — deletes removed files from HF using `--delete="*"`
 **Subdirectory support** — perfect for monorepos
-**Custom commit messages** — synced commits say "Sync from GitHub via huggingface-sync-action"
+**Custom commit messages** — synced commits say "Sync from GitHub via hub-sync"
 
 ## What Gets Synced
 

@@ -113,7 +113,7 @@ runs:
           --exclude=".git*" \
           --exclude=".github*" \
           --delete="*" \
-          --commit-message="Sync from GitHub via huggingface-sync-action"
+          --commit-message="Sync from GitHub via hub-sync"
         echo "::endgroup::"
         
         # Build the correct HF URL based on repo type:
