@@ -1,6 +1,6 @@
 name: Sync With Hugging Face Hub
 description: Sync a GitHub repository to the Hugging Face Hub using the hf CLI
-author: alozowski
+author: huggingface
 branding:
   icon: upload-cloud
   color: yellow

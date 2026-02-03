@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: alozowski/huggingface-sync-action@main
+      - uses: huggingface/huggingface-sync-action@main
         with:
           github_repo_id: ${{ github.repository }}
           huggingface_repo_id: username/repo-name
@@ -31,7 +31,7 @@ jobs:
 ### All Options
 
 ```yaml
-- uses: alozowski/huggingface-sync-action@feature/use-hf-cli-via-uvx
+- uses: huggingface/huggingface-sync-action@main
   with:
     # Required
     github_repo_id: ${{ github.repository }}
