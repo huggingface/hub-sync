@@ -18,8 +18,8 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: huggingface/hub-sync@main
+      - uses: actions/checkout@v6
+      - uses: huggingface/hub-sync@v0.1.0
         with:
           github_repo_id: ${{ github.repository }}
           huggingface_repo_id: username/repo-name
@@ -31,7 +31,7 @@ jobs:
 ### All Options
 
 ```yaml
-- uses: huggingface/hub-sync@main
+- uses: huggingface/hub-sync@v0.1.0
   with:
     # Required
     github_repo_id: ${{ github.repository }}
