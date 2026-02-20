@@ -9,7 +9,7 @@ Uses the official HF CLI via `uvx` for fast, reliable deployments to Spaces, Mod
 Add your HF token as a GitHub secret (`HF_TOKEN`), then:
 
 ```yaml
-name: Sync to Hugging Face
+name: Sync GitHub to Hugging Face Hub
 on:
   push:
     branches: [main]
