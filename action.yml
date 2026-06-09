@@ -31,12 +31,16 @@ inputs:
     required: false
     description: 'Whether the repository should be private'
     default: 'false'
+  hf_version:
+    required: false
+    description: 'huggingface_hub version to pin the hf CLI to. Defaults to the version shown below; set to an empty string to install the latest published version instead.'
+    default: '1.18.0'
 
 runs:
   using: composite
   steps:
     - name: Set up uv
-      uses: astral-sh/setup-uv@v5
+      uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
       with:
         enable-cache: true
 
@@ -49,6 +53,7 @@ runs:
         PRIVATE: ${{ inputs.private }}
         SPACE_SDK: ${{ inputs.space_sdk }}
         SUBDIRECTORY: ${{ inputs.subdirectory }}
+        HF_VERSION: ${{ inputs.hf_version }}
       run: |
         set -euo pipefail
         
@@ -63,11 +68,19 @@ runs:
           echo "Subdirectory: ${SUBDIRECTORY}"
         fi
         echo "::endgroup::"
-        
+
+        # Pin the hf CLI to a specific huggingface_hub version for reproducibility.
+        # If hf_version is empty, fall back to the latest published package.
+        if [[ -n "${HF_VERSION}" ]]; then
+          HF="uvx --from huggingface_hub==${HF_VERSION} hf"
+        else
+          HF="uvx hf"
+        fi
+
         # Build create command
         echo "::group::Creating or updating Hugging Face repo"
-        CREATE_CMD="uvx hf repo create \"${HF_REPO_ID}\" --repo-type \"${REPO_TYPE}\" --exist-ok"
-        
+        CREATE_CMD="${HF} repos create \"${HF_REPO_ID}\" --type \"${REPO_TYPE}\" --exist-ok"
+
         if [[ "${PRIVATE}" == "true" ]]; then
           CREATE_CMD="${CREATE_CMD} --private"
         fi
@@ -106,10 +119,10 @@ runs:
         # --exclude filters .git* and .github* from being uploaded
         echo "::group::Uploading to Hugging Face"
         echo "Uploading ${FILE_COUNT} files..."
-        uvx hf upload \
+        ${HF} upload \
           "${HF_REPO_ID}" \
           "${SRC_DIR}" \
-          --repo-type "${REPO_TYPE}" \
+          --type "${REPO_TYPE}" \
           --exclude=".git*" \
           --exclude=".github*" \
           --delete="*" \
