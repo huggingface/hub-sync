@@ -33,8 +33,7 @@ inputs:
     default: 'false'
   hf_version:
     required: false
-    description: 'huggingface_hub version to pin the hf CLI to. Defaults to the version shown below; set to an empty string to install the latest published version instead.'
-    default: '1.18.0'
+    description: 'huggingface_hub version to pin the hf CLI to. Leave unset to install the latest published version.'
 
 runs:
   using: composite
@@ -56,7 +55,21 @@ runs:
         HF_VERSION: ${{ inputs.hf_version }}
       run: |
         set -euo pipefail
-        
+
+        # Resolve the hf CLI invocation. If hf_version is set, pin huggingface_hub
+        # to that version; otherwise install the latest published version.
+        if [[ -n "${HF_VERSION}" ]]; then
+          HF="uvx --from huggingface_hub==${HF_VERSION} hf"
+        else
+          HF="uvx hf"
+        fi
+
+        # Log the resolved hf CLI version so CI logs record exactly which
+        # version ran (useful for debugging when the CLI is left unpinned).
+        echo "::group::hf CLI version"
+        ${HF} version
+        echo "::endgroup::"
+
         echo "::group::Syncing GitHub repo to Hugging Face"
         echo "Repo ID: ${HF_REPO_ID}"
         echo "Repo type: ${REPO_TYPE}"
@@ -68,14 +81,6 @@ runs:
           echo "Subdirectory: ${SUBDIRECTORY}"
         fi
         echo "::endgroup::"
-
-        # Pin the hf CLI to a specific huggingface_hub version for reproducibility.
-        # If hf_version is empty, fall back to the latest published package.
-        if [[ -n "${HF_VERSION}" ]]; then
-          HF="uvx --from huggingface_hub==${HF_VERSION} hf"
-        else
-          HF="uvx hf"
-        fi
 
         # Build create command
         echo "::group::Creating or updating Hugging Face repo"
