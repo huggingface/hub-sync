@@ -33,7 +33,7 @@ inputs:
     default: 'false'
   hf_version:
     required: false
-    description: 'huggingface_hub version to pin the hf CLI to. Leave unset to install the latest published version.'
+    description: 'hf CLI package version to pin. Leave unset to install the latest published version.'
 
 runs:
   using: composite
@@ -46,6 +46,7 @@ runs:
     - name: Sync to Hugging Face
       shell: bash
       env:
+        GITHUB_REPO_ID: ${{ inputs.github_repo_id }}
         HF_REPO_ID: ${{ inputs.huggingface_repo_id }}
         HF_TOKEN: ${{ inputs.hf_token }}
         REPO_TYPE: ${{ inputs.repo_type }}
@@ -56,22 +57,23 @@ runs:
       run: |
         set -euo pipefail
 
-        # Resolve the hf CLI invocation. If hf_version is set, pin huggingface_hub
-        # to that version; otherwise install the latest published version.
+        # Resolve the hf CLI invocation. If hf_version is set, pin the dedicated
+        # hf package to that version; otherwise install the latest published version.
         if [[ -n "${HF_VERSION}" ]]; then
-          HF="uvx --from huggingface_hub==${HF_VERSION} hf"
+          HF=(uvx "hf@${HF_VERSION}")
         else
-          HF="uvx hf"
+          HF=(uvx hf)
         fi
 
         # Log the resolved hf CLI version so CI logs record exactly which
         # version ran (useful for debugging when the CLI is left unpinned).
         echo "::group::hf CLI version"
-        ${HF} version
+        "${HF[@]}" version
         echo "::endgroup::"
 
         echo "::group::Syncing GitHub repo to Hugging Face"
-        echo "Repo ID: ${HF_REPO_ID}"
+        echo "Source repo ID: ${GITHUB_REPO_ID}"
+        echo "Hugging Face repo ID: ${HF_REPO_ID}"
         echo "Repo type: ${REPO_TYPE}"
         echo "Private: ${PRIVATE}"
         if [[ "${REPO_TYPE}" == "space" ]]; then
@@ -84,19 +86,19 @@ runs:
 
         # Build create command
         echo "::group::Creating or updating Hugging Face repo"
-        CREATE_CMD="${HF} repos create \"${HF_REPO_ID}\" --type \"${REPO_TYPE}\" --exist-ok"
+        CREATE_CMD=("${HF[@]}" repos create "${HF_REPO_ID}" --type "${REPO_TYPE}" --exist-ok)
 
         if [[ "${PRIVATE}" == "true" ]]; then
-          CREATE_CMD="${CREATE_CMD} --private"
+          CREATE_CMD+=(--private)
         fi
         
         if [[ "${REPO_TYPE}" == "space" ]]; then
-          CREATE_CMD="${CREATE_CMD} --space-sdk \"${SPACE_SDK}\""
+          CREATE_CMD+=(--space-sdk "${SPACE_SDK}")
         fi
         
         # Note: We don't pass the token via command line to avoid it appearing in logs
         # Instead, we'll use HF_TOKEN environment variable which huggingface_hub respects
-        eval "${CREATE_CMD}"
+        "${CREATE_CMD[@]}"
         echo "::endgroup::"
         
         # Determine source directory
@@ -124,14 +126,14 @@ runs:
         # --exclude filters .git* and .github* from being uploaded
         echo "::group::Uploading to Hugging Face"
         echo "Uploading ${FILE_COUNT} files..."
-        ${HF} upload \
+        "${HF[@]}" upload \
           "${HF_REPO_ID}" \
           "${SRC_DIR}" \
           --type "${REPO_TYPE}" \
           --exclude=".git*" \
           --exclude=".github*" \
           --delete="*" \
-          --commit-message="Sync from GitHub via hub-sync"
+          --commit-message="Sync from ${GITHUB_REPO_ID} via hub-sync"
         echo "::endgroup::"
         
         # Build the correct HF URL based on repo type:

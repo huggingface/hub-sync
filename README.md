@@ -50,4 +50,4 @@ jobs:
 - **Automatic exclusions** — `.github/` and `.git/` filtered via `--exclude`
 - **True mirroring** — deletes removed files from HF using `--delete="*"`
 - **Subdirectory support** — perfect for monorepos
-- **Custom commit messages** — synced commits say "Sync from GitHub via hub-sync"
+- **Source-aware commit messages** — synced commits identify the originating GitHub repository
